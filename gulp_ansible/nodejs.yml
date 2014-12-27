@@ -1,0 +1,20 @@
+---
+  - name: copy sources of nodejs
+    copy: src=./src/node-v{{ node_version }}.tar.gz dest=/tmp
+
+  - name: Unarchive a tar file of nodejs
+    unarchive: src=/tmp/node-v{{ node_version }}.tar.gz dest=/tmp copy=no
+
+  - name: Ensure nodejs is installed
+    shell: 'cd /tmp/node-v{{ node_version }};{{ item }}'
+    with_items:
+      - "./configure --prefix={{ node_path }}"
+      - make
+      - sudo make install
+
+  - name: install necessary node module globally
+    shell: '{{ node_path }}/bin/npm install -g grunt-cli'
+
+  - name: add node PATH
+    shell: 'echo export PATH={{ node_path }}/bin:$PATH > /etc/profile'
+
